@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initFAQ();
     initModals();
     initSmoothScroll();
+    initPricingTabs();
 });
 
 /* ========================================
@@ -73,7 +74,7 @@ function initMobileMenu() {
    ======================================== */
 function initScrollReveal() {
     const revealElements = document.querySelectorAll(
-        '.feature-card, .feature-card-compact, .step-card, .persona-card, .impact-card, .faq-item, .section-header'
+        '.feature-card, .feature-card-compact, .step-card, .persona-card, .impact-card, .faq-item, .section-header, .pricing-plan-card, .referral-card, .referral-step'
     );
 
     revealElements.forEach(el => el.classList.add('reveal'));
@@ -278,6 +279,50 @@ function initSmoothScroll() {
                     behavior: 'smooth'
                 });
             }
+        });
+    });
+}
+
+/* ========================================
+   Pricing Tabs
+   ======================================== */
+function initPricingTabs() {
+    const tabs = document.querySelectorAll('.pricing-tab');
+    const panels = document.querySelectorAll('.pricing-tab-panel');
+
+    if (!tabs.length || !panels.length) return;
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetPanel = tab.getAttribute('data-tab');
+
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Update active panel with animation
+            panels.forEach(panel => {
+                panel.classList.remove('active');
+                if (panel.getAttribute('data-panel') === targetPanel) {
+                    panel.classList.add('active');
+
+                    // Re-trigger reveal animation on cards in new panel
+                    const cards = panel.querySelectorAll('.pricing-plan-card');
+                    cards.forEach((card, i) => {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                            // Reset featured scale
+                            if (card.classList.contains('pricing-plan-featured')) {
+                                card.style.transform = 'scale(1.03)';
+                            }
+                        }, i * 100);
+                    });
+                }
+            });
         });
     });
 }
